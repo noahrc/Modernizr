@@ -1,0 +1,16 @@
+{
+  "classPrefix": "",
+  "options": [
+    "setClasses",
+    "addTest",
+    "html5printshiv",
+    "load",
+    "testProp",
+    "fnBind"
+  ],
+  "feature-detects": [
+    "test/svg/asimg",
+    "test/svg/inline",
+    "test/svg"
+  ]
+}
