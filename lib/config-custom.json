@@ -9,6 +9,8 @@
     "fnBind"
   ],
   "feature-detects": [
+    "test/workers/webworkers",
+    "test/workers/blobworkers",
     "test/svg/asimg",
     "test/svg/inline",
     "test/svg",

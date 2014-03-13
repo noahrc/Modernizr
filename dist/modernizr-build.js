@@ -1701,6 +1701,114 @@ ModernizrProto['load'] = function() {
   ;
 /*!
 {
+  "name": "Web Workers",
+  "property": "webworkers",
+  "caniuse" : "webworkers",
+  "tags": ["performance", "workers"],
+  "notes": [{
+    "name": "W3C Reference",
+    "href": "http://www.w3.org/TR/workers/"
+  }, {
+    "name": "HTML5 Rocks article",
+    "href": "http://www.html5rocks.com/en/tutorials/workers/basics/"
+  }, {
+    "name": "MDN documentation",
+    "href": "https://developer.mozilla.org/en-US/docs/Web/Guide/Performance/Using_web_workers"
+  }],
+  "polyfills": ["fakeworker", "html5shims"]
+}
+!*/
+/* DOC
+
+Detects support for the basic `Worker` API from the Web Workers spec. Web Workers provide a simple means for web content to run scripts in background threads.
+
+*/
+
+  Modernizr.addTest('webworkers', 'Worker' in window);
+
+/*!
+{
+  "name": "Workers from Blob URIs",
+  "property": "blobworkers",
+  "caniuse" : "blobworkers",
+  "tags": ["performance", "workers"],
+  "notes": [{
+    "name": "W3C Reference",
+    "href": "http://www.w3.org/TR/workers/"
+  }],
+  "knownBugs": ["This test may output garbage to console."],
+  "authors": ["Jussi Kalliokoski"],
+  "async": true
+}
+!*/
+/* DOC
+
+Detects support for creating Web Workers from Blob URIs.
+
+*/
+
+  Modernizr.addAsyncTest(function() {
+    try {
+      // we're avoiding using Modernizr._domPrefixes as the prefix capitalization on
+      // these guys are notoriously peculiar.
+      var BlobBuilder = window.MozBlobBuilder || window.WebKitBlobBuilder || window.MSBlobBuilder || window.OBlobBuilder || window.BlobBuilder;
+      var URL         = window.MozURL || window.webkitURL || window.MSURL || window.OURL || window.URL;
+      var data    = 'Modernizr',
+          blob,
+          bb,
+          worker,
+          url,
+          timeout,
+          scriptText = 'this.onmessage=function(e){postMessage(e.data)}';
+
+      try {
+        blob = new Blob([scriptText], {type:'text/javascript'});
+      } catch(e) {
+        // we'll fall back to the deprecated BlobBuilder
+      }
+      if (!blob) {
+        bb = new BlobBuilder();
+        bb.append(scriptText);
+        blob = bb.getBlob();
+      }
+
+      url = URL.createObjectURL(blob);
+      worker = new Worker(url);
+
+      worker.onmessage = function(e) {
+        addTest('blobworkers', data === e.data);
+        cleanup();
+      };
+
+      // Just in case...
+      worker.onerror = fail;
+      timeout = setTimeout(fail, 200);
+
+      worker.postMessage(data);
+    } catch (e) {
+      fail();
+    }
+
+    function fail() {
+      addTest('blobworkers', false);
+      cleanup();
+    }
+
+    function cleanup() {
+      if (url) {
+        URL.revokeObjectURL(url);
+      }
+      if (worker) {
+        worker.terminate();
+      }
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    }
+  });
+
+/*!
+{
   "name": "SVG as an <img> tag source",
   "property": "svgasimg",
   "caniuse" : "svg-img",
